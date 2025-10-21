@@ -16,30 +16,50 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    # 2. 设置 CMake
+    # 2. 缓存 MSYS2 环境
+    - name: Cache MSYS2
+      uses: actions/cache@v3
+      with:
+        path: |
+          C:\msys64\home\runneradmin\.ccache
+          C:\msys64\mingw64
+        key: ${{ runner.os }}-msys2-${{ hashFiles('.github/workflows/build.yml') }}
+        restore-keys: |
+          ${{ runner.os }}-msys2-
+
+    # 3. 设置 CMake
     - name: Setup CMake
       uses: msys2/setup-msys2@v2
       with:
         update: true
         install: "cmake make gcc"
 
-    # 3. 创建构建目录
-    - name: Create Build Directory
-      run: mkdir build
+    # 4. 缓存 CMake 构建文件
+    - name: Cache CMake Build
+      uses: actions/cache@v3
+      with:
+        path: build
+        key: ${{ runner.os }}-cmake-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-cmake-
 
-    # 4. 配置 CMake
+    # 5. 创建构建目录
+    - name: Create Build Directory
+      run: mkdir -Force build
+
+    # 6. 配置 CMake
     - name: Configure CMake
       run: cmake -B build -DCMAKE_BUILD_TYPE=Release
 
-    # 5. 编译项目
+    # 7. 编译项目
     - name: Build Project
       run: cmake --build build --config Release
 
-    # 6. 列出生成的文件（用于调试）
+    # 8. 列出生成的文件（用于调试）
     - name: List Artifacts
       run: Get-ChildItem build/Release/ | Format-List
 
-    # 7. 创建发布版本
+    # 9. 创建发布版本
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
@@ -51,7 +71,7 @@ jobs:
         draft: false
         prerelease: false
 
-    # 8. 上传可执行文件到发布版本
+    # 10. 上传可执行文件到发布版本
     - name: Upload Release Asset
       uses: actions/upload-release-asset@v1
       env:
