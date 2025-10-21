@@ -1,0 +1,15 @@
+set(CMAKE_SYSTEM_NAME Windows)
+set(CMAKE_SYSTEM_PROCESSOR ARM64)
+
+# 使用 MSYS2 mingw-w64 的 ARM64 编译器
+set(CMAKE_C_COMPILER clang)
+set(CMAKE_CXX_COMPILER clang++)
+
+# ARM64 特定编译标志
+set(CMAKE_C_FLAGS "-target aarch64-w64-windows-gnu" CACHE STRING "C flags")
+set(CMAKE_CXX_FLAGS "-target aarch64-w64-windows-gnu" CACHE STRING "CXX flags")
+
+# 交叉编译设置
+set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
+set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
