@@ -63,9 +63,11 @@ jobs:
               repo: context.repo.repo,
               tag: tag,
             });
+            console.log('Release already exists:', tag);
             core.setOutput('upload_url', release.data.upload_url);
             core.setOutput('release_id', release.data.id);
           } catch (error) {
+            console.log('Creating new release:', tag);
             const release = await github.rest.repos.createRelease({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -80,12 +82,13 @@ jobs:
 
     # 9. 上传 ARM64 可执行文件到发布版本
     - name: Upload ARM64 Release Asset
-      uses: actions/upload-release-asset@v1
+      uses: softprops/action-gh-release@v1
+      if: success()
+      with:
+        files: build-arm64/hello-world
+        tag_name: v${{ github.run_number }}
+        draft: false
+        prerelease: false
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.get_release.outputs.upload_url }}
-        asset_path: build-arm64/hello-world
-        asset_name: hello-world-arm64
-        asset_content_type: application/octet-stream
       continue-on-error: true
