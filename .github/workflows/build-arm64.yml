@@ -45,7 +45,10 @@ jobs:
 
     # 7. 列出生成的文件（用于调试）
     - name: List Artifacts
-      run: ls -la build-arm64/Release/ 2>/dev/null || echo "Build directory empty"
+      run: |
+        echo "Searching for hello-world binary..."
+        find build-arm64 -name "hello-world*" -type f 2>/dev/null || echo "No binary found"
+        ls -la build-arm64/ 2>/dev/null || echo "build-arm64 directory not found"
 
     # 8. 创建或获取发布版本
     - name: Get or Create Release
@@ -82,7 +85,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.get_release.outputs.upload_url }}
-        asset_path: build-arm64/Release/hello-world
+        asset_path: build-arm64/hello-world
         asset_name: hello-world-arm64
         asset_content_type: application/octet-stream
       continue-on-error: true
