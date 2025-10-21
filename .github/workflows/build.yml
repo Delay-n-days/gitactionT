@@ -34,7 +34,7 @@ jobs:
 
     # 6. 列出生成的文件（用于调试）
     - name: List Artifacts
-      run: ls -la build/Release/
+      run: Get-ChildItem build/Release/ | Format-List
 
     # 7. 创建发布版本
     - name: Create Release
