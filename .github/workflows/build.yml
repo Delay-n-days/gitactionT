@@ -1,0 +1,60 @@
+name: Build and Release HelloWorld
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: windows-latest  # 使用 Windows 环境生成 exe
+
+    steps:
+    # 1. 检出代码
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # 2. 设置 CMake
+    - name: Setup CMake
+      uses: msys2/setup-msys2@v2
+      with:
+        update: true
+        install: "cmake make gcc"
+
+    # 3. 创建构建目录
+    - name: Create Build Directory
+      run: mkdir build
+
+    # 4. 配置 CMake
+    - name: Configure CMake
+      run: cmake -B build -DCMAKE_BUILD_TYPE=Release
+
+    # 5. 编译项目
+    - name: Build Project
+      run: cmake --build build --config Release
+
+    # 6. 列出生成的文件（用于调试）
+    - name: List Artifacts
+      run: ls -la build/Release/
+
+    # 7. 创建发布版本
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ github.run_number }}
+        release_name: Release v${{ github.run_number }}
+        draft: false
+        prerelease: false
+
+    # 8. 上传可执行文件到发布版本
+    - name: Upload Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: build/Release/hello-world.exe
+        asset_name: hello-world.exe
+        asset_content_type: application/octet-stream
