@@ -70,6 +70,7 @@ jobs:
         release_name: Release v${{ github.run_number }}
         draft: false
         prerelease: false
+      continue-on-error: true
 
     # 10. 上传可执行文件到发布版本
     - name: Upload Release Asset
@@ -81,3 +82,4 @@ jobs:
         asset_path: build/Release/hello-world.exe
         asset_name: hello-world.exe
         asset_content_type: application/octet-stream
+      continue-on-error: true
