@@ -2,7 +2,7 @@ name: Build and Release HelloWorld
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
 
 jobs:
   build:
